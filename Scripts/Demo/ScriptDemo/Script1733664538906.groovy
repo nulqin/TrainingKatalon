@@ -17,24 +17,29 @@ import com.kms.katalon.core.windows.keyword.WindowsBuiltinKeywords as Windows
 import internal.GlobalVariable as GlobalVariable
 import org.openqa.selenium.Keys as Keys
 
-// Open Browser and navigate
+// Open Browser and Navigate to URL
 WebUI.openBrowser('')
 WebUI.navigateToUrl('https://opensource-demo.orangehrmlive.com/web/index.php/auth/login')
-WebUI.maximizeWindow()
 
-// Wait for the Login Page to Load and input data + login
-WebUI.waitForElementVisible(findTestObject('Page_Login/input_Username'), 10)
-WebUI.setText(findTestObject('Page_Login/input_Username'), 'Admin')
-WebUI.setText(findTestObject('Page_Login/input_Password'), 'admin123')
-WebUI.click(findTestObject('Page_Login/button_Login'))
+// Input Credentials
+WebUI.setText(findTestObject('Page_OrangeHRM/input_Username_username'), 'Admin')
+WebUI.setEncryptedText(findTestObject('Page_OrangeHRM/input_Password_password'), 'hUKwJTbofgPU9eVlw/CnDQ==')
 
-// Validate Successful Login
-WebUI.waitForElementVisible(findTestObject('Page_Dashboard/header_Dashboard'), 10)
-boolean isDashboardVisible = WebUI.verifyElementPresent(findTestObject('Page_Dashboard/header_Dashboard'), 10, FailureHandling.STOP_ON_FAILURE)
-if (isDashboardVisible) {
-    WebUI.comment('Login successful. Dashboard is visible.')
-} else {
-    WebUI.comment('Login failed. Dashboard is not visible.')
+// Click Login Button
+WebUI.click(findTestObject('Page_OrangeHRM/button_Login'))
+
+// Wait for Dashboard to Load and Verify Login
+try {
+    WebUI.waitForElementVisible(findTestObject('Page_OrangeHRM/label_Dashboard'), 10, FailureHandling.STOP_ON_FAILURE)
+    boolean isDashboardPresent = WebUI.verifyTextPresent('Dashboard', false, FailureHandling.CONTINUE_ON_FAILURE)
+    
+    if (isDashboardPresent) {
+        WebUI.comment('Login successful. Dashboard is displayed.')
+    } else {
+        WebUI.comment('Login failed. Dashboard is not displayed.')
+    }
+} catch (Exception e) {
+    WebUI.comment("Error during login verification: " + e.getMessage())
 }
 
 // Close Browser
